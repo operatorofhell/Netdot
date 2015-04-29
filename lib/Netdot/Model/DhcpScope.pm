@@ -723,20 +723,32 @@ sub _print {
     unless ( $type = $data->{$id}->{type} ){
 	$class->throw_fatal("Scope id $id missing type");
     }
-
-    if ( $type ne 'global' && $type ne 'template' ){
+    # generate subnet scope name and directive
+    if ( $type eq 'subnet'){
+      my $name = $data->{$id}->{name};
+      my $ipblock   = DhcpScope->retrieve($id)->ipblock;
+      my $netaddr  = $ipblock->full_address;
+      my $mask  = $ipblock->netaddr->mask;
+      print $fh "# $name\n";
+      print $fh "subnet $netaddr netmask $mask {\n";
+      $indent .= " " x 4;
+    }
+    # print scope name
+    elsif ( $type ne 'global' && $type ne 'template' ){
 	my $st   = $data->{$id}->{statement};
 	my $name = $data->{$id}->{name};
 	print $fh $indent."$st $name {\n";
 	$indent .= " " x 4;
     }
-    
+
+
     # Print free-form text
     if ( $data->{$id}->{text} ){
  	chomp (my $text = $data->{$id}->{text});
  	$text =~ s/\n/\n$indent/g  ;
- 	print $fh $indent.$text, "\n" ;
+ 	print $fh '# '.$text, "\n" ;
     }
+    
     
     # Print attributes
     foreach my $attr_id ( sort { $data->{$id}->{attrs}->{$a}->{name} cmp 
