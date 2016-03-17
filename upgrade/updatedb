@@ -67,7 +67,8 @@ if ( $schema_version eq '1.0.1' ){
 }elsif ( $schema_version eq '1.0.6' ){
     
     &upg_106_107();
-    
+}elsif ( $schema_version eq '1.0.7' ){
+    &upg_107_108();
 }else{
     die "Unsupported version for this upgrade: $schema_version\n";
 }
@@ -339,4 +340,32 @@ sub upg_105_106 {
 #########################################################################
 sub upg_106_107 {
     push @statements, "UPDATE schemainfo SET version='1.0.7' WHERE id=1;",
+}
+
+#########################################################################
+sub upg_107_108 {
+    push @statements, "ALTER TABLE dhcpscope ADD COLUMN `peergroup` bigint(20) DEFAULT NULL;";
+	
+	push @statements, "CREATE TABLE IF NOT EXISTS `dhcppeer` (  `autoPartnerDown` bigint(20) DEFAULT NULL,
+			      `auto_partner_down` int(11),
+                              `hba` text,
+                              `id` bigint(20) NOT NULL AUTO_INCREMENT,
+                              `load_balance_max_seconds` int(11) DEFAULT NULL,
+                              `max_response_delay`  int(11) DEFAULT NULL,
+                              `max_unacked_updates` int(11)  DEFAULT NULL,
+                              `mclt` int(11) DEFAULT NULL,
+                              `name` varchar(64) NOT NULL,
+                              `port` int(11) NOT NULL DEFAULT '510',
+                              `primary_peer` bigint(20) NOT NULL,
+                              `secondary_peer` bigint(20) DEFAULT NULL,
+                              `split` int(11) NOT NULL DEFAULT '128',
+                              PRIMARY KEY (`id`),
+                              UNIQUE KEY `dhcppeer1` (`name`),
+                              KEY `DhcpPeer2` (`name`),
+                              KEY `primary_peer` (`primary_peer`),
+                              KEY `secondary_peer` (`secondary_peer`),
+                              CONSTRAINT `fk_primary_peer` FOREIGN KEY (`primary_peer`) REFERENCES `rr` (`id`),
+                              CONSTRAINT `fk_secondary_peer` FOREIGN KEY (`secondary_peer`) REFERENCES `rr` (`id`)
+                     ) ENGINE=InnoDB;";
+    push @statements, "UPDATE schemainfo SET version='1.0.8' WHERE id=1;";
 }

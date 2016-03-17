@@ -3153,6 +3153,139 @@ $meta = {
       ]
     }
   },
+  DhcpPeer =>{
+    table_db_name => 'dhcppeer',
+    columns => {
+      auto_partner_down => {
+        default => '',
+        description => 'This statement instructs the server to initiate a  timed  delay  upon entering the communications-interrupted state',
+        length => '',
+        nullable => 1,
+        tag => 'auto partner down',
+        type => 'integer'
+      },
+      id => {
+        default => '',
+        description => '',
+        length => '',
+        nullable => 0,
+        tag => undef,
+        type => 'bigint'
+      },
+      hba => {
+        default => '',
+        description => 'The  hba  statement  specifies the split between the primary and secondary as a bitmap rather than a cutoff',
+        length => '256',
+        nullable => 1,
+        tag => 'HBA',
+        type => 'varchar'
+      },
+      max_response_delay => {
+        default => '',
+        description => 'The max-response-delay statement tells the DHCP server how many  seconds  may  pass  without  receiving  a message from its failover peer before it assumes that connection has failed.',
+        length => '',
+        nullable => 1,
+        tag => ' max response delay',
+        type => 'integer'
+      },
+      max_unacked_updates =>{
+        default => '',
+        description => 'The max-unacked-updates statement tells the remote  DHCP  server  how many BNDUPD messages it can send before it receives a BNDACK from the local system.',
+        length => '',
+        nullable => 1,
+        tag => 'max unacked updates',
+        type => 'integer'
+      },
+      mclt =>{
+        default => '',
+        description => 'The mclt statement defines the Maximum Client Lead Time.',
+        length => '',
+        nullable => 1,
+        tag => 'MCLT',
+        type => 'integer',
+      },
+      name => {
+        default => '',
+        description => 'Name of the DHCP Peer group',
+        length => '64',
+        nullable => 0,
+        tag => 'Name',
+        type => 'varchar'
+      },
+      load_balance_max_seconds =>{
+        default => '',
+        description => 'This statement allows you to configure a cutoff after which load balancing  is  disabled.',
+        length => '',
+        nullable => 1,
+        tag => 'load balance max seconds',
+        type => 'integer'
+      },
+      port =>{
+        default => '510',
+        description => 'The port statement declares the TCP port on which the  server  should listen for connections from its failover peer.',
+        length => '',
+        nullable => 0,
+        tag => 'Port',
+        type => 'integer',
+      },
+      primary_peer => {
+        default => '',
+        description => 'Reference to the primary Peer host.',
+        length => '',
+        linksto => {
+          cascade => 'Nullify',
+          method => 'primaryPeer',
+          table => 'RR'
+        },
+        nullable => 0,
+        tag => 'Primary Peer',
+        type => 'bigint'
+      },
+      secondary_peer => {
+        default => '',
+        description => 'Reference to the secondary Peer host.',
+        length => '',
+        linksto => {
+          cascade => 'Nullify',
+          method => 'secondaryPeer',
+          table => 'RR'
+        },
+        nullable => 1,
+        tag => 'Secondary Peer',
+        type => 'bigint'
+      },
+      split => {
+        default => '128',
+        description => 'The  split statement specifies the split between the primary and secondary for the purposes of load balancing. ',
+        length => '',
+        nullable => 0,
+        tag => 'Split',
+        type => 'integer'
+      },
+    },
+    description => 'A ISC DHCP Peer Group',
+    has_history => 0,
+    index => [],
+    isJoin => '0',
+    label => ['name'],
+    primary_key => 'id',
+    unique => [['name']],
+    views => {
+      all => [
+        'name',
+        'hba',
+        'max_response_delay',
+        'max_unacked_updates',
+        'mclt',
+        'load_balance_max_seconds',
+        'port',
+        'primary_peer',
+        'secondary_peer',
+        'split',
+	'auto_partner_down',
+      ]
+    }
+  },
   DhcpScope => {
     table_db_name => 'dhcpscope',
     columns => {
@@ -3246,6 +3379,19 @@ $meta = {
         tag => 'Container Scope',
         type => 'bigint'
       },
+      peergroup => {
+        default => '',
+        description => 'Name of failover peer to assign to pools by default.  Valid in Subnet and Global scopes.  Subnet scope value takes precedence.',
+        length => '',
+        linksto => {
+          cascade => 'Nullify',
+          method => 'peergroup',
+          table => 'DhcpPeer'
+        },
+        nullable => 1,
+        tag => 'Peer Group',
+        type => 'bigint',
+      },
       physaddr => {
         default => '',
         description => 'Reference to a MAC object.  Only useful within host scopes.',
@@ -3305,6 +3451,7 @@ $meta = {
         'enable_failover',
         'failover_peer',
         'export_file',
+	'peergroup',
       ],
       class => [
         'name',
@@ -3322,7 +3469,8 @@ $meta = {
         'failover_peer',
         'export_file',
         'text',
-      ],
+        'peergroup'
+     ],
       group => [
         'name',
         'type',
@@ -3374,7 +3522,8 @@ $meta = {
         'ipblock',
         'enable_failover',
         'failover_peer',
-        'text'
+        'text',
+	'peergroup',
       ],
       brief => [
         'name',
