@@ -18,3 +18,4 @@ all: dir
 # This section creates the export/ subdirs
 dir:
 	$(mkdirs)
+	git init $(STAGEDIR)/export/dhcp.git

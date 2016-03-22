@@ -15,6 +15,7 @@ my %types = (
     'Rancid'    => 'Netdot::Exporter::Rancid',
     'BIND'      => 'Netdot::Exporter::BIND',
     'DHCPD'     => 'Netdot::Exporter::DHCPD',
+    'DHCP_PEER' => 'Netdot::Exporter::DHCP_PEER',
     'Smokeping' => 'Netdot::Exporter::Smokeping',
     );
 
