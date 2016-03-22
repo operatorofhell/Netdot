@@ -8,3 +8,4 @@ etc/Site.conf*
 etc/schema*
 upgrade/error.log
 var/pollstats.rrd
+tests
