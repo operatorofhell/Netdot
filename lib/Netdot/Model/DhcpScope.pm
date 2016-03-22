@@ -775,14 +775,24 @@ sub _print {
     if ( $type eq 'subnet' ){
 	my $s   = DhcpScope->retrieve($id);
 
-	my $failover_enabled = ($s->enable_failover && 
-				$s->container->enable_failover)? 1 : 0;
-	my $failover_peer = $s->failover_peer || 
-	    $s->container->failover_peer;
+    my ( $failover_enabled, $failover_peer);
+
+    if ( $s->peergroup ) {
+        $failover_enabled = 1;
+        $failover_peer = $s->peergroup->name;
+    } elsif (  $s->container->peergroup ) {
+        $failover_enabled = 1;
+        $failover_peer = $s->container->peergroup->name;
+    } else {
+        $failover_enabled = ($s->enable_failover &&
+            $s->container->enable_failover)? 1 : 0;
+        $failover_peer = $s->failover_peer ||
+            $s->container->failover_peer;
+    }
 
 	my $ipb = $s->ipblock;
 	my @ranges = $ipb->get_dynamic_ranges();
-
+    print $failover_peer . "\n";
 	if ( @ranges ){
 	    if ( $failover_enabled && $failover_peer ne ""){
 		print $fh $indent."pool {\n";
