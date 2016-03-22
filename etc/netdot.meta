@@ -3282,8 +3282,13 @@ $meta = {
         'primary_peer',
         'secondary_peer',
         'split',
-	'auto_partner_down',
-      ]
+        'auto_partner_down',
+      ],
+      brief => [
+        'name',
+        'primary_peer',
+        'secondary_peer',
+      ],
     }
   },
   DhcpScope => {
