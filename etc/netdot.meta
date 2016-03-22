@@ -3390,7 +3390,7 @@ $meta = {
         length => '',
         linksto => {
           cascade => 'Nullify',
-          method => 'peergroup',
+          method => 'scopes',
           table => 'DhcpPeer'
         },
         nullable => 1,
